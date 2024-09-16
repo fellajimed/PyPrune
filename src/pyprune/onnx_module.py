@@ -1,6 +1,7 @@
 import torch
 import onnx
 import onnxruntime
+from onnx2pytorch import ConvertModel
 from os import PathLike
 from pathlib import Path
 import numpy as np
@@ -37,6 +38,16 @@ class ONNXModule:
 
         # Perform inference
         return self.session.run(None, {input_name: inputs})[0]
+
+
+    def to_pytorch(self,
+                   onnx_model: onnx.ModelProto | None = None
+                   ) -> torch.nn.Module:
+        # FIXME: requires batch_size=1
+        if onnx_model is None:
+            onnx_model = self.onnx_model
+
+        return ConvertModel(onnx_model)
 
 
     @staticmethod
@@ -89,6 +100,13 @@ if __name__ == "__main__":
     # tests
     assert onnx_outputs.shape == (7, 5)
     assert torch.allclose(torch.from_numpy(onnx_outputs), model(inputs))
+
+    # get PyTorch model
+    model_from_onnx = onnx_module.to_pytorch()
+    model_from_onnx.eval()
+    inputs = torch.randn(1, 10)
+
+    assert torch.allclose(model(inputs), model_from_onnx(inputs))
 
     print('Success!!!')
 
