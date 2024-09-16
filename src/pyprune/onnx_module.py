@@ -94,7 +94,3 @@ if __name__ == "__main__":
 
     # delete onnx file
     dest.unlink(missing_ok=True)
-
-
-
-

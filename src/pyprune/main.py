@@ -1,6 +1,7 @@
 from pathlib import Path
 from argparse import ArgumentParser
-from onnxruntime.quantization import quantize_dynamic
+
+from .quantization import onnx_quantize
 
 
 def main() -> None:
@@ -16,7 +17,7 @@ def main() -> None:
         args.dest = args.source.parent / fname
 
 
-    quantize_dynamic(args.source, args.dest)
+    onnx_quantize(args.source, args.dest)
 
 
 if __name__ == "__main__":
