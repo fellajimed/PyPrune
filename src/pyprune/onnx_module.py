@@ -6,6 +6,8 @@ from os import PathLike
 from pathlib import Path
 import numpy as np
 
+from .prune import prune_weights
+
 
 class ONNXModule:
     def __init__(self, *, 
@@ -38,6 +40,11 @@ class ONNXModule:
 
         # Perform inference
         return self.session.run(None, {input_name: inputs})[0]
+
+
+    def prune(self, strategy: str = "weights", **kwargs) -> None:
+        if strategy.lower() == "weights":
+            prune_weights(self.onnx_model, **kwargs)
 
 
     def to_pytorch(self,
